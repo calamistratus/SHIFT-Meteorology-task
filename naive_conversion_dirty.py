@@ -20,9 +20,9 @@ url = (
     '&end_date=2025-05-30'
 )
 
-responce = requests.get(url)
-if responce.status_code != 200: raise DownloadError('Could not get a responce')
-data = responce.json()
+response = requests.get(url)
+if response.status_code != 200: raise Exception('Could not get a responce')
+data = response.json()
 
 hourly_data = pd.DataFrame(data['hourly'])
 hourly_data['day_index'] = hourly_data.index // 24
