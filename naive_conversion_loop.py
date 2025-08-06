@@ -205,12 +205,20 @@ na_fill_iso = pd.to_datetime(0, unit='s', origin='unix').tz_localize(data['timez
 for i in ('sunset', 'sunrise'):
     data_dict[i + '_iso'] = pd.to_datetime(pd.Series(data['daily'][i]), unit='s', origin='unix').apply(lambda x: x.tz_localize(data['timezone']).isoformat()).fillna(na_fill_iso)
 
+data_dict['day_start_index'] = pd.Series(hourly_data['day_index'].unique()).map(lambda x: hourly_data['time'].iloc[x * 24]).fillna(na_fill_iso)
 data_dict['daylight_hours'] = ((pd.Series(data['daily']['sunset']) - np.array(data['daily']['sunrise'])) / 3600).fillna(-1)
 
 for i in data_dict:
     if not type(data_dict[i]) is list:
         data_dict[i] = data_dict[i].tolist()
 
+df = pd.DataFrame(data_dict)
+
+for i in df:
+    if type(df[i][0]) is pd.Series:
+        temp = df[i]
+        df[i] = df[i].to_json()
+                
 path_csv = path.join(getcwd(), 'converted_meteorology_data.csv')
 print(path_csv)
-pd.DataFrame(data_dict).round(digits_round).to_csv(path_csv, index=False)
+df.to_csv(path_csv, index=False)
